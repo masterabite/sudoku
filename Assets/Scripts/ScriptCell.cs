@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 public class ScriptCell : MonoBehaviour
 {
+
     private GameObject _board;
     private String _trueValue;
     private String _userValue;
@@ -96,4 +97,5 @@ public class ScriptCell : MonoBehaviour
     {
         _board.GetComponent<ScriptBoard>().SelectCell(_position);
     }
+
 }

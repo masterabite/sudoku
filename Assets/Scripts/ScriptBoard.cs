@@ -5,7 +5,7 @@ using Random = System.Random;
 
 [RequireComponent(typeof(Text))]
 public class ScriptBoard : MonoBehaviour {
-    
+
     //клетки
     private ScriptCellPick[] _cellsPick;       //массив клеток выбора
     private ScriptCell[][] _cells;       //матрица клеток
@@ -111,6 +111,7 @@ public class ScriptBoard : MonoBehaviour {
         {
             return;
         }
+        
         if (!_keyPressed)
         {
             for (int i = 0; i < _size; ++i)
@@ -135,6 +136,49 @@ public class ScriptBoard : MonoBehaviour {
         _size = _lSize * _lSize;
     }
 
+    private void OpenSelectedCell()
+    {
+        _selectedCell.SetOpen(true);
+        _selectedCell.GetText().color = _colorSymbolRight;
+        CheckPick();
+    }
+
+    //Метод проверяет все клетки выбора на полноту
+    private void CheckPick()
+    {
+        var countValue = new int[_size];
+        for (var i = 0; i < _size; ++i)
+        {
+            countValue[i] = 0;
+        }
+        
+        for (var i = 0; i < _size; ++i)
+        {
+            for (var j = 0; j < _size; ++j)
+            {
+                if (_cells[i][j].IsOpen())
+                {
+                    var keyIndex = keyString.IndexOf(_cells[i][j].GetTrueValue()[0]);
+                    ++countValue[keyIndex];
+                }
+                else if (!string.IsNullOrEmpty(_cells[i][j].GetUserValue()))
+                {
+                    var keyIndex = keyString.IndexOf(_cells[i][j].GetUserValue()[0]);
+                    countValue[keyIndex] = -1;
+                }
+            }
+        }
+        
+        for (int i = 0; i < _size; ++i)
+        {
+            if (countValue[i] == _size)
+            {
+                _cellsPick[i].SetVisible(false);
+            }
+        }
+        //Debug.Log(countValue.ToString());
+    }
+    
     private void DoMistake()
     {
         _mistakeText.text = "Ошибок: " + Convert.ToString(Convert.ToInt32(_mistakeText.text.Substring(8))+1);
@@ -148,14 +192,14 @@ public class ScriptBoard : MonoBehaviour {
         if (str.Equals(_selectedCell.GetUserValue()))
         {
             _selectedCell.SetUserValue("");
+            CheckPick();
             return;
         }
         
         //
         if (_selectedCell.GetTrueValue().Equals(str))
         {
-            _selectedCell.GetText().color = _colorSymbolRight;
-            _selectedCell.SetOpen(true);
+            OpenSelectedCell();
             MatchOpen(str);
         }
         else
@@ -297,8 +341,15 @@ public class ScriptBoard : MonoBehaviour {
     //Функция показывает открытые клетки с конкретным значением
     public void MatchOpen(String key)
     {
+        if (string.IsNullOrEmpty(key)) { return; }
+
+        var keyIndex = keyString.IndexOf(key[0]);
+
         for (int i = 0; i < _size; ++i)
         {
+            //сначала определяем цвет клетки для выбора
+            _cellsPick[i].GetComponent<SpriteRenderer>().color = i==keyIndex? _colorCellSelected: _colorCellDefault;
+            
             for (int j = 0; j < _size; ++j)
             {
                 var scrij = _cells[i][j].GetComponent<ScriptCell>();
@@ -338,5 +389,5 @@ public class ScriptBoard : MonoBehaviour {
             _selectedCell.gameObject.GetComponent<SpriteRenderer>().color = _colorCellSelected;
         }
     }
-
+    
 }

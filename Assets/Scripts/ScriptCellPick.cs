@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 public class ScriptCellPick : MonoBehaviour
 {
+
     private ScriptBoard _board;
     private Text _myText;
     
@@ -32,5 +33,11 @@ public class ScriptCellPick : MonoBehaviour
                 _board.MatchOpen(_myText.text);
             }
         }
+    }
+
+    public void SetVisible(bool visible)
+    {
+        gameObject.SetActive(visible);
+        _myText.gameObject.SetActive(visible);
     }
 }
